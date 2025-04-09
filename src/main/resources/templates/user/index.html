@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Usuários</title>
+</head>
+<body>
+    <div th:insert="~{panel}"></div>
+    <div>
+        <h2>Listagem de Usuários</h2>
+    </div>
+
+    <br><br>
+
+    <a class="btn btn-primary" href="/panel/user/new">Novo Usuario +</a>
+    <br>
+
+    <table class="table table-striped table-">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuário</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}">ID</td>
+                <td th:text="${user.username}">Usuário</td>
+                <td th:text="${user.email}">Email</td>
+                <td>
+                    <a class="btn btn-primary"
+                        th:href="@{/panel/user/edit/{id}(id=${user.id})}">
+                        Editar
+                    </a>
+                    <form th:id="'delete-form-' + ${user.id}"
+                          th:action="@{/panel/user/delete/{id}(id=${user.id})}"
+                          method="post"
+                          style="display: inline;">
+                        <button type="button" class="btn btn-danger"
+                                th:onclick="'confirmDelete(' + ${user.id} + ')'">
+                            Apagar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${#lists.isEmpty(users)}">Nenhum usuário encontrado.</p>
+
+    <script>
+        function confirmDelete(userId) {
+            if (confirm("Tem certeza que deseja apagar este usuário?")) {
+                document.getElementById("delete-form-" + userId).submit();
+            }
+        }
+    </script>
+</body>
+</html>

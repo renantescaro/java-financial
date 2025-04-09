@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Usuário</title>
+</head>
+<body>
+    <div th:insert="~{panel}"></div>
+
+    <h1>Novo Usuário</h1>
+    <form
+        th:action="@{/panel/user/new}"
+        method="post"
+        th:object="${user}"
+        autocomplete="off">
+        <div class="row" style="margin: 0 30px 0 30px;">
+            <div class="mb-6">
+                <label for="name" class="col-form-label">Usuário</label>
+                <input
+                    type="text" class="form-control"
+                    name="name" id="name" autocomplete="off"
+                    th:field="*{username}" required>
+            </div>
+            <div class="mb-6">
+                <label for="email" class="col-form-label">Email</label>
+                <input
+                    type="email" class="form-control"
+                    name="email" id="email" autocomplete="off"
+                    th:field="*{email}" required>
+            </div>
+            <div class="mb-6">
+                <label for="password" class="col-form-label">Senha</label>
+                <input
+                    type="text" class="form-control"
+                    name="password" id="password" autocomplete="off"
+                    th:field="*{password}" required>
+            </div>
+            <div class="mb-6">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a class="btn btn-warning" th:href="@{/panel/user}">Cancelar</a>
+            </div>
+        </div>
+    </form>
+
+    <script>
+    </script>
+</body>
+</html>
