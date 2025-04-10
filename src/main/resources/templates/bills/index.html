@@ -20,52 +20,69 @@
             Novo Gastos +
         </a>
         <br>
-    
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Entrada/Saída</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
-                    <th>Valor</th>
-                    <th>Data Hora</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="item : ${bills}">
-                    <td th:text="${item.kind}">Entrada/Saída</td>
-                    <td th:text="${item.name}">Nome</td>
-                    <td th:text="${item.financialKind.name}">Tipo</td>
-                    <td th:text="${item.value}">Valor</td>
-                    <td th:text="${item.time}">Data Hora</td>
-                    <td>
-                        <a
-                            class="btn btn-primary"
-                            th:href="@{/panel/bills/edit/{id}(id=${item.id})}">
-                            Editar
-                        </a>
-                        <form
-                            th:id="'delete-form-' + ${item.id}"
-                            th:action="@{/panel/bills/delete/{id}(id=${item.id})}"
-                            method="post" style="display: inline;">
-                            <button
-                                type="button" class="btn btn-danger"
-                                th:onclick="'confirmDelete(' + ${item.id} + ')'">
-                                Apagar
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    
-        <p th:if="${#lists.isEmpty(bills)}">
-            Nenhuma gastos encontrada.
-        </p>
+
+        <div id="table"></div>
     </div>
 
-    <script>
+    <link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js" type="text/javascript"></script>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let dados = [[${bills}]];
+        /*]]>*/
+
+        var table = new Tabulator("#table", {
+            layout: "fitColumns",
+            pagination: "local",
+            height: window.screen.height - 370,
+            movableColumns: true,
+            data: dados,
+            columns:[
+                {title:"Entrada/Saída", field:"kind", width:150, headerFilter:"input" },
+                {title:"Nome", field:"name", width:150, headerFilter:"input" },
+                {title:"Tipo", field:"financialKindName", width:150, headerFilter:"input" },
+                {title:"Valor", field:"value", width:150, headerFilter:"input",
+                    sorter:"number", bottomCalc:"sum", bottomCalcParams:{precision:3}},
+                {title:"Data Hora", field:"time", width:150, headerFilter:"input" },
+                {
+                    title: "", field: "", width: 80,
+                    formatter: function (cell, formatterParams, onRendered) {
+                        let id = cell.getRow().getData().id
+                        let a = document.createElement('a')
+
+                        a.textContent = 'Editar'
+                        a.className = 'btn btn-warning btn-sm'
+                        a.href = '/panel/bills/edit/' + id
+                        return a
+                    }
+                },
+                {
+                    title: "", field: "", width: 80,
+                    formatter: function (cell, formatterParams, onRendered) {
+                        let id = cell.getRow().getData().id
+                        let button = document.createElement('button')
+
+                        button.textContent = 'Deletar'
+                        button.className = 'btn btn-danger btn-sm'
+                        button.addEventListener('click', function(){
+                            if(confirm("Deseja realmente apagar o registro?")){
+                                var http = new XMLHttpRequest()
+                                http.open("POST", "/panel/bills/delete/" + id, true)
+                                http.send()
+                                http.onreadystatechange = function(){
+                                    if (http.readyState == 4 && http.status == 200){
+                                        window.location = '/panel/bills'
+                                    }
+                                }
+                            }
+                        })
+                        return button
+                    }
+                },
+            ],
+        });
+
         function confirmDelete(itemId) {
             if (confirm("Tem certeza que deseja apagar esta gastos?")) {
                 document.getElementById("delete-form-" + itemId).submit();

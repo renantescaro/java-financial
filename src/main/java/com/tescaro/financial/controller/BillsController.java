@@ -1,10 +1,14 @@
 package com.tescaro.financial.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.tescaro.financial.dto.BillsDTO;
 import com.tescaro.financial.enums.KindEnum;
 import com.tescaro.financial.model.Bills;
 import com.tescaro.financial.repository.BillsRepository;
 import com.tescaro.financial.repository.FinancialKindRepository;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Controller;
@@ -30,9 +34,30 @@ public class BillsController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String listRender(Model model) {
-        List<Bills> bills = billsRepository.findAll();
-        model.addAttribute("bills", bills);
-        return "bills/index";
+        try {
+            List<Bills> bills = billsRepository.findAll();
+
+            List<BillsDTO> billsDto = bills.stream().map(b -> {
+                BillsDTO dto = new BillsDTO();
+                dto.id = b.getId();
+                dto.name = b.getName();
+                dto.kind = b.getKind().getDescription();
+                dto.time = b.getTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+                dto.value = b.getValue();
+                dto.financialKindId = b.getFinancialKind().getId();
+                dto.financialKindName = b.getFinancialKind().getName();
+                return dto;
+            }).toList();
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+
+            model.addAttribute("bills", mapper.writeValueAsString(billsDto));
+            return "bills/index";
+        } catch (Exception e) {
+            System.err.println(e);
+            return "bills/index";
+        }
     }
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
