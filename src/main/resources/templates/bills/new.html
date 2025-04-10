@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Gastos</title>
+</head>
+
+<body>
+    <div th:insert="~{panel}"></div>
+
+    <div style="margin: 0 30px 0 30px;">
+        <h1>Nova Gastos</h1>
+        <form
+            th:action="@{/panel/bills/new}"
+            method="post" th:object="${bills}">
+            <div class="row">
+                <div class="col-2 mb-6">
+                    <label for="value" class="col-form-label">
+                        Valor
+                    </label>
+                    <input
+                        type="number" class="form-control"
+                        name="value" id="value"
+                        th:field="*{value}" required>
+                </div>
+                <div class="col-5 mb-6">
+                    <label for="name" class="col-form-label">
+                        Nome
+                    </label>
+                    <input
+                        type="text" class="form-control"
+                        name="name" id="name"
+                        th:field="*{name}" required>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-2 mb-6">
+                    <label for="kind">Entrada/Saída</label>
+                    <select name="kind" id="kind" class="form-control">
+                        <option value="">Selecione</option>
+                        <option
+                            th:each="kind : ${kinds}"
+                            th:value="${kind}"
+                            th:text="${kind}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-2 mb-6">
+                    <label for="kind">Tipo de Gasto</label>
+                    <select name="financialKind" id="financialKind" class="form-control">
+                        <option value="">Selecione</option>
+                        <option
+                            th:each="item : ${financialKinds}"
+                            th:value="${item.id}"
+                            th:text="${item.name}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-3 mb-6">
+                    <label for="time">
+                        Data Hora
+                    </label>
+                    <input
+                        type="datetime-local"
+                        class="form-control"
+                        name="time" id="time"
+                        th:field="*{time}" required>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="mb-6">
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        Salvar
+                    </button>
+                    <a class="btn btn-warning" th:href="@{/panel/bills}">
+                        Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    </script>
+</body>
+
+</html>
